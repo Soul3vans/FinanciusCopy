@@ -1,0 +1,22 @@
+{% extends 'finanzas/base.html' %}
+{% block titulo %}Transacciones{% endblock %}
+{% block contenido %}
+  <h2>Transacciones</h2>
+  <a href="{% url 'crear_transaccion' %}">+ Nueva</a>
+  {% for t in transacciones %}
+  <div>
+    <strong>{{ t.get_tipo_display }}</strong> |
+    {{ t.fecha }} {{ t.hora }} |
+    {{ t.cuenta_origen.titulo }} |
+    {{ t.monto }} {{ t.cuenta_origen.moneda.simbolo }}
+    {% if t.tipo == 'transferencia' %}
+      → {{ t.cuenta_destino.titulo }} {{ t.monto_destino }} {{ t.cuenta_destino.moneda.simbolo }}
+    {% endif %}
+    {% if t.confirmada %}✓{% endif %}
+    <a href="{% url 'editar_transaccion' t.pk %}">Editar</a>
+    <a href="{% url 'eliminar_transaccion' t.pk %}">Eliminar</a>
+  </div>
+  {% empty %}
+    <p>No hay transacciones.</p>
+  {% endfor %}
+{% endblock %}

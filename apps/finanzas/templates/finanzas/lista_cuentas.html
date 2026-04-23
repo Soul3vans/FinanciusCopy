@@ -1,0 +1,16 @@
+{% extends 'finanzas/base.html' %}
+{% block titulo %}Cuentas{% endblock %}
+{% block contenido %}
+  <h2>Cuentas</h2>
+  <a href="{% url 'crear_cuenta' %}">+ Nueva</a>
+  {% for c in cuentas %}
+  <div>
+    <strong>{{ c.titulo }}</strong> | {{ c.moneda.simbolo }} | {{ c.balance }}
+    {% if c.incluir_en_totales %} | En totales {% endif %}
+    <a href="{% url 'editar_cuenta' c.pk %}">Editar</a>
+    <a href="{% url 'eliminar_cuenta' c.pk %}">Eliminar</a>
+  </div>
+  {% empty %}
+    <p>No hay cuentas.</p>
+  {% endfor %}
+{% endblock %}

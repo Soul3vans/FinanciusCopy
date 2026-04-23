@@ -1,0 +1,48 @@
+{% extends 'finanzas/base.html' %}
+{% block titulo %}Moneda{% endblock %}
+{% block contenido %}
+  <h2>{% if moneda %}Editar{% else %}Nueva{% endif %} Moneda</h2>
+  <form method="post">
+    {% csrf_token %}
+    <label>Símbolo</label>
+    <input type="text" name="simbolo" value="{{ moneda.simbolo }}" required>
+
+    <label>Moneda principal</label>
+    <input type="checkbox" name="es_principal" {% if moneda.es_principal %}checked{% endif %}>
+
+    <label>Separador de millares</label>
+    <select name="separador_millares">
+      {% for val, label in moneda_form_choices.separador_millares %}
+        <option value="{{ val }}" {% if moneda.separador_millares == val %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+
+    <label>Separador decimal</label>
+    <select name="separador_decimal">
+      <option value="." {% if moneda.separador_decimal == '.' %}selected{% endif %}>Punto .</option>
+      <option value="," {% if moneda.separador_decimal == ',' %}selected{% endif %}>Coma ,</option>
+      <option value=" " {% if moneda.separador_decimal == ' ' %}selected{% endif %}>Espacio</option>
+    </select>
+
+    <label>Decimales</label>
+    <select name="decimales">
+      <option value="0" {% if moneda.decimales == 0 %}selected{% endif %}>0</option>
+      <option value="1" {% if moneda.decimales == 1 %}selected{% endif %}>1</option>
+      <option value="2" {% if moneda.decimales == 2 %}selected{% endif %}>2</option>
+    </select>
+
+    <label>Formato</label>
+    <select name="formato">
+      <option value="0 S" {% if moneda.formato == '0 S' %}selected{% endif %}>0 S</option>
+      <option value="0S" {% if moneda.formato == '0S' %}selected{% endif %}>0S</option>
+      <option value="S 0" {% if moneda.formato == 'S 0' %}selected{% endif %}>S 0</option>
+      <option value="S0" {% if moneda.formato == 'S0' %}selected{% endif %}>S0</option>
+    </select>
+
+    <label>Tasa de cambio</label>
+    <input type="number" step="0.0001" name="tasa_cambio" value="{{ moneda.tasa_cambio|default:'1.0' }}">
+
+    <button type="submit">Guardar</button>
+    <a href="{% url 'lista_monedas' %}">Cancelar</a>
+  </form>
+{% endblock %}

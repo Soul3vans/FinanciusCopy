@@ -1,0 +1,108 @@
+{% extends 'finanzas/base.html' %}
+{% block titulo %}Transacción{% endblock %}
+{% block contenido %}
+  <h2>{% if transaccion %}Editar{% else %}Nueva{% endif %} Transacción</h2>
+  <form method="post" id="form-transaccion">
+    {% csrf_token %}
+
+    <label>Tipo</label>
+    <select name="tipo" id="tipo" onchange="toggleTipo()">
+      <option value="gasto" {% if transaccion.tipo == 'gasto' %}selected{% endif %}>Gasto</option>
+      <option value="ingreso" {% if transaccion.tipo == 'ingreso' %}selected{% endif %}>Ingreso</option>
+      <option value="transferencia" {% if transaccion.tipo == 'transferencia' %}selected{% endif %}>Transferencia</option>
+    </select>
+
+    <label>Fecha</label>
+    <input type="date" name="fecha" value="{{ transaccion.fecha|default:hoy|date:'Y-m-d' }}" required>
+
+    <label>Hora</label>
+    <input type="time" name="hora" value="{{ transaccion.hora|default:hoy|time:'H:i' }}" required>
+
+    <label>Cuenta origen</label>
+    <select name="cuenta_origen" id="cuenta_origen" onchange="actualizarMoneda()">
+      {% for c in cuentas %}
+        <option value="{{ c.pk }}" data-moneda="{{ c.moneda.simbolo }}" data-tasa="{{ c.moneda.tasa_cambio }}"
+          {% if transaccion.cuenta_origen_id == c.pk %}selected{% endif %}>
+          {{ c.titulo }} ({{ c.moneda.simbolo }})
+        </option>
+      {% endfor %}
+    </select>
+
+    <div id="seccion-transferencia" style="display:none">
+      <label>Cuenta destino</label>
+      <select name="cuenta_destino" id="cuenta_destino" onchange="calcularMonto()">
+        {% for c in cuentas %}
+          <option value="{{ c.pk }}" data-moneda="{{ c.moneda.simbolo }}" data-tasa="{{ c.moneda.tasa_cambio }}"
+            {% if transaccion.cuenta_destino_id == c.pk %}selected{% endif %}>
+            {{ c.titulo }} ({{ c.moneda.simbolo }})
+          </option>
+        {% endfor %}
+      </select>
+
+      <label>Tasa de cambio</label>
+      <input type="number" step="0.0001" name="tasa_cambio" id="tasa_cambio"
+        value="{{ transaccion.tasa_cambio|default:'1.0' }}" oninput="calcularMonto()">
+
+      <p id="info-monedas"></p>
+      <p>Monto destino: <strong id="monto_destino_display">0.00</strong></p>
+      <input type="hidden" name="monto_destino" id="monto_destino">
+    </div>
+
+    <div id="seccion-categoria">
+      <label>Categoría</label>
+      <select name="categoria">
+        <option value="">-- Sin categoría --</option>
+        {% for cat in categorias %}
+          <option value="{{ cat.pk }}" {% if transaccion.categoria_id == cat.pk %}selected{% endif %}>
+            {{ cat.nombre }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <label>Monto</label>
+    <input type="number" step="0.01" name="monto" id="monto"
+      value="{{ transaccion.monto|default:'0' }}" oninput="calcularMonto()" required>
+
+    <label>Nota</label>
+    <textarea name="nota">{{ transaccion.nota }}</textarea>
+
+    <label>Confirmada</label>
+    <input type="checkbox" name="confirmada" {% if transaccion.confirmada or not transaccion %}checked{% endif %}>
+
+    <label>Incluir en informes</label>
+    <input type="checkbox" name="incluir_en_informes" {% if transaccion.incluir_en_informes or not transaccion %}checked{% endif %}>
+
+    <button type="submit">Guardar</button>
+    <a href="{% url 'lista_transacciones' %}">Cancelar</a>
+  </form>
+
+  <script>
+    function toggleTipo() {
+      const tipo = document.getElementById('tipo').value;
+      document.getElementById('seccion-transferencia').style.display =
+        tipo === 'transferencia' ? 'block' : 'none';
+      document.getElementById('seccion-categoria').style.display =
+        tipo !== 'transferencia' ? 'block' : 'none';
+    }
+
+    function calcularMonto() {
+      const monto = parseFloat(document.getElementById('monto').value) || 0;
+      const tasa = parseFloat(document.getElementById('tasa_cambio').value) || 1;
+      const resultado = monto * tasa;
+      document.getElementById('monto_destino_display').textContent = resultado.toFixed(2);
+      document.getElementById('monto_destino').value = resultado;
+    }
+
+    function actualizarMoneda() {
+      const origen = document.getElementById('cuenta_origen');
+      const destino = document.getElementById('cuenta_destino');
+      const mo = origen.options[origen.selectedIndex].dataset.moneda;
+      const md = destino.options[destino.selectedIndex].dataset.moneda;
+      document.getElementById('info-monedas').textContent = mo + ' → ' + md;
+    }
+
+    toggleTipo();
+    actualizarMoneda();
+  </script>
+{% endblock %}

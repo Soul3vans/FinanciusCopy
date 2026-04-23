@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html>
+<head><title>Configurar 2FA</title></head>
+<body>
+  <h2>Escanea este QR con Google Authenticator</h2>
+  <img src="data:image/png;base64,{{ qr }}">
+  <a href="{% url 'verify_2fa' %}">Ya escaneé el QR</a>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{% extends 'finanzas/base.html' %}
+{% block titulo %}Monedas{% endblock %}
+{% block contenido %}
+  <h2>Monedas</h2>
+  <a href="{% url 'crear_moneda' %}">+ Nueva</a>
+  {% for m in monedas %}
+  <div>
+    <strong>{{ m.simbolo }}</strong>
+    {% if m.es_principal %} ★ Principal {% endif %}
+    | Tasa: {{ m.tasa_cambio }}
+    <a href="{% url 'editar_moneda' m.pk %}">Editar</a>
+    <a href="{% url 'eliminar_moneda' m.pk %}">Eliminar</a>
+  </div>
+  {% empty %}
+    <p>No hay monedas.</p>
+  {% endfor %}
+{% endblock %}

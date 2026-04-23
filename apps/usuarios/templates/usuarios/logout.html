@@ -1,0 +1,12 @@
+{% extends 'finanzas/base.html' %}
+{% block titulo %}Cerrar sesión{% endblock %}
+{% block contenido %}
+  <h2>Confirmar cierre de sesión</h2>
+  <p>Ingresa tu contraseña para cifrar y cerrar tu base de datos de forma segura.</p>
+  <form method="post">
+    {% csrf_token %}
+    <input type="password" name="password" placeholder="Contraseña" required>
+    {% if error %}<p>{{ error }}</p>{% endif %}
+    <button type="submit">Cerrar sesión</button>
+  </form>
+{% endblock %}

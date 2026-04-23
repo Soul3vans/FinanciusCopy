@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head><title>Login</title></head>
+<body>
+  <form method="post">
+    {% csrf_token %}
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="password" name="password" placeholder="Contraseña" required>
+    <input type="text" name="ruta_mmb" placeholder="Ruta del archivo .mmb" required>
+    <input type="password" name="db_password" placeholder="Contraseña de base de datos" required>
+    {% if error %}<p>{{ error }}</p>{% endif %}
+    <button type="submit">Entrar</button>
+  </form>
+</body>
+</html>
