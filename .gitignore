@@ -1,1 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+.venv/
+venv/
+env/
 .env
+
+# Node / npm
+node_modules/
+npm-debug.log*
+yarn-error.log*
+.npm/
+frontend/dist/
+dist/
+
+# Variables de entorno (¡importante! nunca subir esto)
+.env
+.env.local
+.env.*.local
+
+#BDs
+*.mmb
+db.sqlite3
+
+# Editores
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+#Others
+media/
