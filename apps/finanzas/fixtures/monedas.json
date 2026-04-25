@@ -1,0 +1,8 @@
+[
+  {"model": "finanzas.moneda", "pk": 1, "fields": {"usuario": null, "simbolo": "USD", "es_principal": false, "separador_millares": ",", "separador_decimal": ".", "decimales": 2, "formato": "S0", "tasa_cambio": 1.0}},
+  {"model": "finanzas.moneda", "pk": 2, "fields": {"usuario": null, "simbolo": "EUR", "es_principal": false, "separador_millares": ".", "separador_decimal": ",", "decimales": 2, "formato": "S0", "tasa_cambio": 1.0}},
+  {"model": "finanzas.moneda", "pk": 3, "fields": {"usuario": null, "simbolo": "CLP", "es_principal": false, "separador_millares": ".", "separador_decimal": ",", "decimales": 0, "formato": "S0", "tasa_cambio": 1.0}},
+  {"model": "finanzas.moneda", "pk": 4, "fields": {"usuario": null, "simbolo": "CUP", "es_principal": false, "separador_millares": ",", "separador_decimal": ".", "decimales": 2, "formato": "S0", "tasa_cambio": 1.0}},
+  {"model": "finanzas.moneda", "pk": 5, "fields": {"usuario": null, "simbolo": "MXN", "es_principal": false, "separador_millares": ",", "separador_decimal": ".", "decimales": 2, "formato": "S0", "tasa_cambio": 1.0}},
+  {"model": "finanzas.moneda", "pk": 6, "fields": {"usuario": null, "simbolo": "GBP", "es_principal": false, "separador_millares": ",", "separador_decimal": ".", "decimales": 2, "formato": "S0", "tasa_cambio": 1.0}}
+]

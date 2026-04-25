@@ -21,7 +21,7 @@ class Moneda(models.Model):
         ('S0', 'S0'),
     ]
 
-    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     simbolo = models.CharField(max_length=10)  # CUP, USD, CLP
     es_principal = models.BooleanField(default=False)
     separador_millares = models.CharField(max_length=2, choices=SEPARADOR_MILLARES, default=',')

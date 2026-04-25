@@ -11,9 +11,18 @@ class BaseUserViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(usuario=self.request.user)
 
-class MonedaViewSet(BaseUserViewSet):
-    queryset = Moneda.objects.all()
+class MonedaViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = MonedaSerializer
+
+    def get_queryset(self):
+        from django.db.models import Q
+        return Moneda.objects.filter(
+            Q(usuario=self.request.user) | Q(usuario__isnull=True)
+        )
+
+    def perform_create(self, serializer):
+        serializer.save(usuario=self.request.user)
 
 class CuentaViewSet(BaseUserViewSet):
     queryset = Cuenta.objects.all()
