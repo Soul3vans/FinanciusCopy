@@ -85,27 +85,13 @@ def dashboard_view(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def logout_view(request):
-    import traceback
-    try:
         password = request.data.get('password')
         user = request.user
-        
-        # Debug
-        print(f"Usuario: {user.email}")
-        print(f"Password recibido: {password}")
-        print(f"Auth header: {request.headers.get('Authorization', 'NINGUNO')}")
-        
-        auth = authenticate(email=user.email, password=password)
-        print(f"Authenticate result: {auth}")
-        
+        auth = authenticate(request, email=user.email, password=password)
         if not auth:
             return Response({'error': 'Contraseña incorrecta'}, status=400)
-            
         ruta_mmb = Path(settings.MEDIA_ROOT) / f'db_{user.pk}.mmb'
         if DB_ACTIVA.exists():
             cifrar_db(password, ruta_mmb)
             limpiar_db_temporal()
         return Response({'ok': True})
-    except Exception as e:
-        print(traceback.format_exc())
-        return Response({'error': str(e)}, status=500)
