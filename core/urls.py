@@ -20,7 +20,7 @@ from rest_framework.routers import DefaultRouter
 from finanzas.api import MonedaViewSet, CuentaViewSet, CategoriaViewSet, TransaccionViewSet
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from apps.usuarios import views as usuarios_views
-from apps.finanzas import views_tasas
+from finanzas import views_tasas
 
 router = DefaultRouter()
 router.register(r'monedas', MonedaViewSet, basename='moneda')

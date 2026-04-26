@@ -50,6 +50,14 @@ export default function FormTransaccion() {
         params: { origen: o.moneda.simbolo, destino: d.moneda.simbolo }
       })
       const tasa = res.data.tasa
+
+      // Actualizar tasa en BD para la moneda destino
+      const monedas = await axios.get('/api/monedas/')
+      const monedaDestino = monedas.data.find(m => m.simbolo === d.moneda.simbolo)
+      if (monedaDestino) {
+        await axios.patch(`/api/monedas/${monedaDestino.id}/`, { tasa_cambio: tasa })
+      }
+
       const montoDestino = calcularDestino(form.monto, tasa)
       setForm(f => ({ ...f, tasa_cambio: tasa, monto_destino: montoDestino }))
     } catch {
@@ -63,9 +71,25 @@ export default function FormTransaccion() {
   useEffect(() => {
     if (form.tipo !== 'transferencia') return
     if (!form.cuenta_origen || !form.cuenta_destino) return
-    if (mismaMoneda()) {
+
+    const o = getCuenta(form.cuenta_origen)
+    const d = getCuenta(form.cuenta_destino)
+    if (!o || !d) return
+
+    if (o.moneda.simbolo === d.moneda.simbolo) {
       setForm(f => ({ ...f, tasa_cambio: 1, monto_destino: parseFloat(f.monto) || 0 }))
+      return
     }
+
+    // Heredar tasa guardada en BD
+    axios.get('/api/monedas/').then(res => {
+      const monedaDestino = res.data.find(m => m.simbolo === d.moneda.simbolo)
+      if (monedaDestino) {
+        const tasa = monedaDestino.tasa_cambio
+        const montoDestino = calcularDestino(form.monto, tasa)
+        setForm(f => ({ ...f, tasa_cambio: tasa, monto_destino: montoDestino }))
+      }
+    })
   }, [form.cuenta_origen, form.cuenta_destino])
 
   const guardar = async () => {
