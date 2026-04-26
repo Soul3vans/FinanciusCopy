@@ -17,6 +17,10 @@ urlpatterns = [
     path('transacciones/crear/', views.crear_transaccion, name='crear_transaccion'),
     path('transacciones/<int:pk>/editar/', views.editar_transaccion, name='editar_transaccion'),
     path('transacciones/<int:pk>/eliminar/', views.eliminar_transaccion, name='eliminar_transaccion'),
+    # Apis
     path('api/tasa-cambio/', views.tasa_cambio_api, name='tasa_cambio_api'),
+    path('api/tasa/', views_tasas.obtener_tasa, name='obtener_tasa'),
+    path('api/tasas/actualizar/', views_tasas.actualizar_todas_tasas, name='actualizar_tasas'),
+
 ]
 

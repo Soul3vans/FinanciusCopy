@@ -17,6 +17,7 @@ export default function FormTransaccion() {
     monto_destino: 0, nota: '',
     confirmada: true, incluir_en_informes: true
   })
+  const [actualizando, setActualizando] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -25,19 +26,47 @@ export default function FormTransaccion() {
     if (id) axios.get(`/api/transacciones/${id}/`).then(r => setForm(r.data))
   }, [id])
 
+  const getCuenta = (cuentaId) =>
+    cuentas.find(c => c.id === parseInt(cuentaId))
+
+  const mismaMoneda = () => {
+    const o = getCuenta(form.cuenta_origen)
+    const d = getCuenta(form.cuenta_destino)
+    return o && d && o.moneda.simbolo === d.moneda.simbolo
+  }
+
+  const calcularDestino = (monto, tasa) => {
+    const resultado = parseFloat(monto) * parseFloat(tasa)
+    return isNaN(resultado) ? 0 : parseFloat(resultado.toFixed(4))
+  }
+
+  const actualizarTasa = async () => {
+    const o = getCuenta(form.cuenta_origen)
+    const d = getCuenta(form.cuenta_destino)
+    if (!o || !d) return
+    setActualizando(true)
+    try {
+      const res = await axios.get('/api/tasa/', {
+        params: { origen: o.moneda.simbolo, destino: d.moneda.simbolo }
+      })
+      const tasa = res.data.tasa
+      const montoDestino = calcularDestino(form.monto, tasa)
+      setForm(f => ({ ...f, tasa_cambio: tasa, monto_destino: montoDestino }))
+    } catch {
+      setError('No se pudo obtener la tasa')
+    } finally {
+      setActualizando(false)
+    }
+  }
+
+  // Al cambiar cuenta origen o destino
   useEffect(() => {
-    if (form.tipo === 'transferencia') calcularDestino()
-  }, [form.monto, form.tasa_cambio])
-
-  const calcularDestino = () => {
-    const resultado = parseFloat(form.monto) * parseFloat(form.tasa_cambio)
-    setForm(f => ({ ...f, monto_destino: isNaN(resultado) ? 0 : resultado }))
-  }
-
-  const monedaCuenta = (cuentaId) => {
-    const c = cuentas.find(c => c.id === parseInt(cuentaId))
-    return c ? c.moneda.simbolo : ''
-  }
+    if (form.tipo !== 'transferencia') return
+    if (!form.cuenta_origen || !form.cuenta_destino) return
+    if (mismaMoneda()) {
+      setForm(f => ({ ...f, tasa_cambio: 1, monto_destino: parseFloat(f.monto) || 0 }))
+    }
+  }, [form.cuenta_origen, form.cuenta_destino])
 
   const guardar = async () => {
     try {
@@ -56,17 +85,19 @@ export default function FormTransaccion() {
     }
   }
 
+  const cuentaOrigen = getCuenta(form.cuenta_origen)
+  const cuentaDestino = getCuenta(form.cuenta_destino)
+
   return (
     <>
       <Navbar />
       <div style={{ padding: 16 }}>
         <h2>{id ? 'Editar' : 'Nueva'} Transacción</h2>
 
-        {/* Tabs tipo */}
+        {/* Tabs */}
         <div style={{ display: 'flex', marginBottom: 16, borderRadius: 8, overflow: 'hidden', border: '1px solid var(--borde)' }}>
           {['gasto', 'ingreso', 'transferencia'].map(t => (
-            <button key={t}
-              onClick={() => setForm({ ...form, tipo: t })}
+            <button key={t} onClick={() => setForm({ ...form, tipo: t })}
               style={{
                 flex: 1, padding: 10, border: 'none', cursor: 'pointer',
                 background: form.tipo === t ? 'var(--primario)' : 'var(--bg-card)',
@@ -92,7 +123,7 @@ export default function FormTransaccion() {
             </div>
           </div>
 
-          <label>{form.tipo === 'gasto' ? 'Cuenta' : form.tipo === 'ingreso' ? 'Hacia cuenta' : 'Cuenta origen'}</label>
+          <label>{form.tipo === 'ingreso' ? 'Hacia cuenta' : 'Cuenta origen'}</label>
           <select value={form.cuenta_origen}
             onChange={e => setForm({ ...form, cuenta_origen: e.target.value })}>
             <option value="">-- Seleccionar --</option>
@@ -111,17 +142,6 @@ export default function FormTransaccion() {
                   <option key={c.id} value={c.id}>{c.titulo} ({c.moneda.simbolo})</option>
                 ))}
               </select>
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, opacity: 0.7, margin: '4px 0' }}>
-                <span>{monedaCuenta(form.cuenta_origen)}</span>
-                <span>→</span>
-                <span>{monedaCuenta(form.cuenta_destino)}</span>
-              </div>
-
-              <label>Tasa de cambio</label>
-              <input type="number" step="0.0001" value={form.tasa_cambio}
-                onChange={e => setForm({ ...form, tasa_cambio: e.target.value })}
-                onBlur={calcularDestino} />
             </>
           )}
 
@@ -138,18 +158,54 @@ export default function FormTransaccion() {
             </>
           )}
 
-          <label>Monto {monedaCuenta(form.cuenta_origen) && `(${monedaCuenta(form.cuenta_origen)})`}</label>
+          <label>Monto {cuentaOrigen ? `(${cuentaOrigen.moneda.simbolo})` : ''}</label>
           <input type="number" step="0.01" value={form.monto}
-            onChange={e => setForm({ ...form, monto: e.target.value })}
-            onBlur={calcularDestino} />
+            onChange={e => {
+              const monto = e.target.value
+              const destino = calcularDestino(monto, form.tasa_cambio)
+              setForm(f => ({ ...f, monto, monto_destino: destino }))
+            }} />
 
-          {form.tipo === 'transferencia' && (
-            <p style={{ color: 'var(--primario)', margin: '8px 0' }}>
-              = {parseFloat(form.monto_destino).toLocaleString()} {monedaCuenta(form.cuenta_destino)}
-            </p>
+          {/* Sección tasa de cambio — solo si es transferencia con monedas distintas */}
+          {form.tipo === 'transferencia' && form.cuenta_origen && form.cuenta_destino && (
+            <div style={{ marginTop: 12, padding: 12, background: 'var(--bg)', borderRadius: 8, border: '1px solid var(--borde)' }}>
+              {mismaMoneda() ? (
+                <p style={{ fontSize: 13, opacity: 0.7 }}>
+                  Misma moneda ({cuentaOrigen?.moneda.simbolo}) — sin conversión
+                </p>
+              ) : (
+                <>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 8 }}>
+                    <span>{cuentaOrigen?.moneda.simbolo}</span>
+                    <span>→</span>
+                    <span>{cuentaDestino?.moneda.simbolo}</span>
+                  </div>
+
+                  <label>Tasa de cambio</label>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <input type="number" step="0.0001" value={form.tasa_cambio}
+                      style={{ flex: 1 }}
+                      onChange={e => {
+                        const tasa = e.target.value
+                        const destino = calcularDestino(form.monto, tasa)
+                        setForm(f => ({ ...f, tasa_cambio: tasa, monto_destino: destino }))
+                      }} />
+                    <button className="btn btn-secundario"
+                      style={{ width: 'auto', padding: '0 12px' }}
+                      onClick={actualizarTasa} disabled={actualizando}>
+                      {actualizando ? '...' : '🔄'}
+                    </button>
+                  </div>
+                </>
+              )}
+
+              <p style={{ marginTop: 8, color: 'var(--primario)', fontWeight: 'bold' }}>
+                Recibirá: {parseFloat(form.monto_destino).toLocaleString()} {cuentaDestino?.moneda.simbolo}
+              </p>
+            </div>
           )}
 
-          <label>Nota</label>
+          <label style={{ marginTop: 12 }}>Nota</label>
           <textarea value={form.nota}
             onChange={e => setForm({ ...form, nota: e.target.value })} />
 

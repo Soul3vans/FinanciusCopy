@@ -20,9 +20,10 @@ from rest_framework.routers import DefaultRouter
 from finanzas.api import MonedaViewSet, CuentaViewSet, CategoriaViewSet, TransaccionViewSet
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from apps.usuarios import views as usuarios_views
+from apps.finanzas import views_tasas
 
 router = DefaultRouter()
-router.register(r'monedas', MonedaViewSet)
+router.register(r'monedas', MonedaViewSet, basename='moneda')
 router.register(r'cuentas', CuentaViewSet)
 router.register(r'categorias', CategoriaViewSet)
 router.register(r'transacciones', TransaccionViewSet)
@@ -37,4 +38,6 @@ urlpatterns = [
     path('api/logout/', usuarios_views.logout_view, name='api_logout'),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/tasa/', views_tasas.obtener_tasa, name='obtener_tasa'),
+    path('api/tasas/actualizar/', views_tasas.actualizar_todas_tasas, name='actualizar_tasas'),
 ]
