@@ -21,7 +21,7 @@ export default function Navbar() {
   return (
     <>
       <nav>
-        <span style={{ color: 'var(--primario)', fontWeight: 'bold' }}>💰 Finanzas</span>
+        <span style={{ color: 'var(--primario)', fontWeight: 'bold', cursor: 'pointer' }} onClick={() => navigate('/')}>💰 Finanzas</span>
         <div style={{ display: 'flex', gap: 12 }}>
           <button className="btn btn-secundario" style={{ width: 'auto' }}
             onClick={() => navigate('/ajustes')}>⚙️</button>

@@ -35,3 +35,46 @@ class CategoriaViewSet(BaseUserViewSet):
 class TransaccionViewSet(BaseUserViewSet):
     queryset = Transaccion.objects.all()
     serializer_class = TransaccionSerializer
+
+    def perform_create(self, serializer):
+        transaccion = serializer.save(usuario=self.request.user)
+        self._actualizar_balances(transaccion)
+
+    def perform_update(self, serializer):
+        # Revertir transacción anterior
+        old = self.get_object()
+        self._revertir_balances(old)
+        transaccion = serializer.save()
+        self._actualizar_balances(transaccion)
+
+    def perform_destroy(self, instance):
+        self._revertir_balances(instance)
+        instance.delete()
+
+    def _actualizar_balances(self, t):
+        origen = t.cuenta_origen
+        if t.tipo == 'gasto':
+            origen.balance -= t.monto
+        elif t.tipo == 'ingreso':
+            origen.balance += t.monto
+        elif t.tipo == 'transferencia':
+            origen.balance -= t.monto
+            if t.cuenta_destino:
+                destino = t.cuenta_destino
+                destino.balance += t.monto_destino
+                destino.save()
+        origen.save()
+
+    def _revertir_balances(self, t):
+        origen = t.cuenta_origen
+        if t.tipo == 'gasto':
+            origen.balance += t.monto
+        elif t.tipo == 'ingreso':
+            origen.balance -= t.monto
+        elif t.tipo == 'transferencia':
+            origen.balance += t.monto
+            if t.cuenta_destino:
+                destino = t.cuenta_destino
+                destino.balance -= t.monto_destino
+                destino.save()
+        origen.save()

@@ -4,6 +4,8 @@ from .models import Moneda, Cuenta, Categoria, Transaccion
 class MonedaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Moneda
+        fields = ['id', 'simbolo', 'es_principal', 'tasa_cambio',
+                  'separador_millares', 'separador_decimal', 'decimales', 'formato']
         exclude = ['usuario']
 
 class CuentaSerializer(serializers.ModelSerializer):

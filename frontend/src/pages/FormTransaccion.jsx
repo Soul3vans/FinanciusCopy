@@ -72,7 +72,7 @@ export default function FormTransaccion() {
     }
   }
 
-  // Al cambiar cuenta origen o destino
+  // Al cambiar cuentas → cargar tasa guardada automáticamente
   useEffect(() => {
     if (form.tipo !== 'transferencia') return
     if (!form.cuenta_origen || !form.cuenta_destino) return
@@ -86,16 +86,38 @@ export default function FormTransaccion() {
       return
     }
 
-    // Heredar tasa guardada en BD
+    // Buscar tasa guardada en Monedas
     axios.get('/api/monedas/').then(res => {
-      const monedaDestino = res.data.find(m => m.simbolo === d.moneda.simbolo)
-      if (monedaDestino) {
-        const tasa = monedaDestino.tasa_cambio
-        const montoDestino = calcularDestino(form.monto, tasa)
-        setForm(f => ({ ...f, tasa_cambio: tasa, monto_destino: montoDestino }))
+      const monedas = res.data
+      const mOrigen = monedas.find(m => m.simbolo === o.moneda.simbolo)
+      const mDestino = monedas.find(m => m.simbolo === d.moneda.simbolo)
+      const mPrincipal = monedas.find(m => m.es_principal)
+
+      let tasa = 1
+      if (mOrigen && mDestino && mPrincipal) {
+        // Convertir via moneda principal
+        // 1 origen → principal → destino
+        const origenEnPrincipal = mOrigen.es_principal ? 1 : (1 / (mOrigen.tasa_cambio || 1))
+        const destinoEnPrincipal = mDestino.es_principal ? 1 : mDestino.tasa_cambio
+        tasa = origenEnPrincipal * destinoEnPrincipal
       }
+
+      setForm(f => ({
+        ...f,
+        tasa_cambio: parseFloat(tasa.toFixed(6)),
+        monto_destino: calcularDestino(f.monto, tasa)
+      }))
     })
-  }, [form.cuenta_origen, form.cuenta_destino])
+  }, [form.cuenta_origen, form.cuenta_destino, form.tipo])
+
+  // Al cambiar monto → recalcular destino
+  useEffect(() => {
+    if (form.tipo !== 'transferencia') return
+    setForm(f => ({
+      ...f,
+      monto_destino: calcularDestino(f.monto, f.tasa_cambio)
+    }))
+  }, [form.monto])
 
   const guardar = async () => {
     try {
@@ -229,7 +251,7 @@ export default function FormTransaccion() {
               )}
 
               <p style={{ marginTop: 8, color: 'var(--primario)', fontWeight: 'bold' }}>
-                Recibirá: {parseFloat(form.monto_destino).toLocaleString()} {cuentaDestino?.moneda.simbolo}
+                Recibirá: {parseFloat(form.monto_destino).toFixed(2)} {cuentaDestino?.moneda.simbolo}
               </p>
             </div>
           )}

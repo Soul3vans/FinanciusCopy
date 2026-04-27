@@ -41,11 +41,11 @@ def actualizar_todas_tasas(request):
 
         actualizadas = []
         for moneda in monedas:
-            tasa = data['rates'].get(moneda.simbolo)
-            if tasa:
-                moneda.tasa_cambio = tasa
+            tasa_api = data['rates'].get(moneda.simbolo)
+            if tasa_api and tasa_api > 0:
+                moneda.tasa_cambio = round(1 / tasa_api, 6)
                 moneda.save()
-                actualizadas.append({'simbolo': moneda.simbolo, 'tasa': tasa})
+                actualizadas.append({'simbolo': moneda.simbolo, 'tasa': moneda.tasa_cambio})
 
         return Response({'actualizadas': actualizadas, 'base': principal.simbolo})
     except Exception as e:

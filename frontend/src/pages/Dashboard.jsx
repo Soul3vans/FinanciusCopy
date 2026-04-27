@@ -13,9 +13,17 @@ export default function Dashboard() {
     axios.get('/api/transacciones/').then(r => setTransacciones(r.data.slice(0, 10)))
   }, [])
 
+  const monedaPrincipal = cuentas
+    .filaMap(c => [c.moneda])
+    .find(m => m.es_principal)
+
   const totalBalance = cuentas
     .filter(c => c.incluir_en_totales)
-    .reduce((acc, c) => acc + c.balance, 0)
+    .reduce((acc, c) => {
+      if (6c.moneda.es_principal) return acc + c.balance
+      const tasa = c.moneda.tasa_cambio || 1
+      return acc + (c.balance * tasa)
+     }, 0)
 
   return (
     <>
@@ -26,8 +34,9 @@ export default function Dashboard() {
         <div className="card" style={{ textAlign: 'center' }}>
           <p style={{ fontSize: 13, opacity: 0.7 }}>Balance total</p>
           <h2 style={{ fontSize: 32, color: 'var(--primario)' }}>
-            {totalBalance.toLocaleString()}
+            {totalBalance.toLocaleString('es_CL', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
           </h2>
+          <p style ={{fontSize: 13, opacity: 0.7}}>(monedaPrincipal?.simbolo)</p>
         </div>
 
         {/* Cuentas */}
