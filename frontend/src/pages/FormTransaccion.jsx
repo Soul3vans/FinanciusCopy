@@ -46,16 +46,21 @@ export default function FormTransaccion() {
     if (!o || !d) return
     setActualizando(true)
     try {
-      const res = await axios.get('/api/tasa/', {
-        params: { origen: o.moneda.simbolo, destino: d.moneda.simbolo }
-      })
-      const tasa = res.data.tasa
+      // Primero busca en las monedas guardadas del usuario
+      const res = await axios.get('/api/monedas/')
+      const monedaDestino = res.data.find(m => m.simbolo === d.moneda.simbolo)
+      const monedaOrigen = res.data.find(m => m.simbolo === o.moneda.simbolo)
 
-      // Actualizar tasa en BD para la moneda destino
-      const monedas = await axios.get('/api/monedas/')
-      const monedaDestino = monedas.data.find(m => m.simbolo === d.moneda.simbolo)
-      if (monedaDestino) {
-        await axios.patch(`/api/monedas/${monedaDestino.id}/`, { tasa_cambio: tasa })
+      let tasa = 1
+      if (monedaDestino && monedaOrigen) {
+        // tasa = cuanto vale 1 unidad de origen en destino
+        tasa = monedaDestino.tasa_cambio / monedaOrigen.tasa_cambio
+        } else {
+        // Fallback a API si no está guardada
+        const apiRes = await axios.get('/api/tasa/', {
+          params: { origen: o.moneda.simbolo, destino: d.moneda.simbolo }
+        })
+        tasa = apiRes.data.tasa
       }
 
       const montoDestino = calcularDestino(form.monto, tasa)

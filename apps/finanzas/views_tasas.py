@@ -24,15 +24,11 @@ def obtener_tasa(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def actualizar_todas_tasas(request):
-    """Actualiza tasas de todas las monedas del usuario respecto a la principal"""
+    from django.db.models import Q
     try:
         principal = Moneda.objects.filter(
-            usuario=request.user, es_principal=True
+            Q(usuario=request.user, es_principal=True)
         ).first()
-        if not principal:
-            principal = Moneda.objects.filter(
-                usuario__isnull=True, es_principal=True
-            ).first()
         if not principal:
             return Response({'error': 'No hay moneda principal'}, status=400)
 
@@ -41,7 +37,7 @@ def actualizar_todas_tasas(request):
 
         monedas = Moneda.objects.filter(
             usuario=request.user
-        ).exclude(es_principal=True)
+        ).exclude(id=principal.id)
 
         actualizadas = []
         for moneda in monedas:
@@ -52,5 +48,16 @@ def actualizar_todas_tasas(request):
                 actualizadas.append({'simbolo': moneda.simbolo, 'tasa': tasa})
 
         return Response({'actualizadas': actualizadas, 'base': principal.simbolo})
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def monedas_mundo(request):
+    try:
+        res = requests.get(API_URL.format('USD'), timeout=5)
+        data = res.json()
+        monedas = [{'simbolo': k} for k in data['rates'].keys()]
+        return Response(monedas)
     except Exception as e:
         return Response({'error': str(e)}, status=500)

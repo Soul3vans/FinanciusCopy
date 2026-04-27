@@ -34,7 +34,7 @@ export default function Dashboard() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h3>Cuentas</h3>
           <button className="btn" style={{ width: 'auto' }}
-            onClick={() => navigate('/cuentas/nueva')}>+ Nueva</button>
+            onClick={() => navigate('/cuentas/nueva')}>+ Nueva cuenta</button>
         </div>
         {cuentas.map(c => (
           <div className="card" key={c.id}
@@ -50,7 +50,7 @@ export default function Dashboard() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16 }}>
           <h3>Recientes</h3>
           <button className="btn" style={{ width: 'auto' }}
-            onClick={() => navigate('/transacciones/nueva')}>+ Nueva</button>
+            onClick={() => navigate('/transacciones/nueva')}>+ Nueva transaccion</button>
         </div>
         {transacciones.map(t => (
           <div className="card" key={t.id}

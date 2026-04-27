@@ -21,6 +21,7 @@ urlpatterns = [
     path('api/tasa-cambio/', views.tasa_cambio_api, name='tasa_cambio_api'),
     path('api/tasa/', views_tasas.obtener_tasa, name='obtener_tasa'),
     path('api/tasas/actualizar/', views_tasas.actualizar_todas_tasas, name='actualizar_tasas'),
+    path('api/monedas-mundo/', views_tasas.monedas_mundo, name='monedas_mundo'),
 
 ]
 
