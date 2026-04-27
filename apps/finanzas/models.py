@@ -55,9 +55,14 @@ class Categoria(models.Model):
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     nombre = models.CharField(max_length=100)
     color = models.CharField(max_length=7, default='#000000')  # hex
+    padre = models.ForeignKey(
+        'self', on_delete=models.CASCADE,
+        null=True, blank=True,
+        related_name='subcategorias'
+    )
 
     def __str__(self):
-        return self.nombre
+        return f"{self.padre.nombre} > {self.nombre}" if self.padre else self.nombre
 
 class Transaccion(models.Model):
     TIPO_CHOICES = [

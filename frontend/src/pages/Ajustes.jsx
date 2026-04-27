@@ -32,10 +32,19 @@ export default function Ajustes() {
 
         <div className="card" style={{ marginTop: 16 }}>
           <h3 style={{ marginBottom: 12 }}>Finanzas</h3>
-          <button className="btn" onClick={() => navigate('/monedas')}>
+          <button className="btn" onClick={() => navigate('/monedas')} style={{ marginBottom: 8 }}>
             💱 Gestionar Monedas
           </button>
-        </div>
+          <button className="btn btn-secundario" onClick={() => navigate('/cuentas')} style={{ marginBottom: 8 }}>
+            🏦 Gestionar Cuentas
+          </button>
+          <button className="btn btn-secundario" onClick={() => navigate('/transacciones')} style={{ marginBottom: 8 }}>
+            💸 Gestionar Transacciones
+          </button>
+          <button className="btn btn-secundario" onClick={() => navigate('/categorias')}>
+            🏷️ Gestionar Categorías
+          </button>
+       </div>
       </div>
     </>
   )

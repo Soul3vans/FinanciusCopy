@@ -6,7 +6,6 @@ class MonedaSerializer(serializers.ModelSerializer):
         model = Moneda
         fields = ['id', 'simbolo', 'es_principal', 'tasa_cambio',
                   'separador_millares', 'separador_decimal', 'decimales', 'formato']
-        exclude = ['usuario']
 
 class CuentaSerializer(serializers.ModelSerializer):
     moneda = MonedaSerializer(read_only=True)
@@ -18,9 +17,14 @@ class CuentaSerializer(serializers.ModelSerializer):
         exclude = ['usuario']
 
 class CategoriaSerializer(serializers.ModelSerializer):
+    subcategorias = serializers.SerializerMethodField()
+
     class Meta:
         model = Categoria
         exclude = ['usuario']
+
+    def get_subcategorias(self, obj):
+        return CategoriaSerializer(obj.subcategorias.all(), many=True).data
 
 class TransaccionSerializer(serializers.ModelSerializer):
     class Meta:

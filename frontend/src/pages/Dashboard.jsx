@@ -8,19 +8,23 @@ export default function Dashboard() {
   const [transacciones, setTransacciones] = useState([])
   const navigate = useNavigate()
 
+  const [error, setError] = useState('')
+
   useEffect(() => {
     axios.get('/api/cuentas/').then(r => setCuentas(r.data))
+.catch(e => setError('Cuentas: ' + e.message))
     axios.get('/api/transacciones/').then(r => setTransacciones(r.data.slice(0, 10)))
-  }, [])
+.catch(e => setError('Transacciones: ' + e.message)) 
+ }, [])
 
   const monedaPrincipal = cuentas
-    .filaMap(c => [c.moneda])
+    .flatMap(c => [c.moneda])
     .find(m => m.es_principal)
 
   const totalBalance = cuentas
     .filter(c => c.incluir_en_totales)
     .reduce((acc, c) => {
-      if (6c.moneda.es_principal) return acc + c.balance
+      if (c.moneda.es_principal) return acc + c.balance
       const tasa = c.moneda.tasa_cambio || 1
       return acc + (c.balance * tasa)
      }, 0)
@@ -30,13 +34,14 @@ export default function Dashboard() {
       <Navbar />
       <div style={{ padding: 16 }}>
 
+{error && <p style={{ color: 'var(--error)', padding: 16 }}>{error}</p>}
         {/* Balance total */}
         <div className="card" style={{ textAlign: 'center' }}>
           <p style={{ fontSize: 13, opacity: 0.7 }}>Balance total</p>
           <h2 style={{ fontSize: 32, color: 'var(--primario)' }}>
-            {totalBalance.toLocaleString('es_CL', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+            {totalBalance.toLocaleString('es-CL', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
           </h2>
-          <p style ={{fontSize: 13, opacity: 0.7}}>(monedaPrincipal?.simbolo)</p>
+          <p style ={{fontSize: 13, opacity: 0.7}}>{monedaPrincipal?.simbolo}</p>
         </div>
 
         {/* Cuentas */}
