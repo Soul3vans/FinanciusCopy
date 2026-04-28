@@ -50,15 +50,28 @@ export default function Dashboard() {
           <button className="btn" style={{ width: 'auto' }}
             onClick={() => navigate('/cuentas/nueva')}>+ Nueva cuenta</button>
         </div>
-        {cuentas.map(c => (
-          <div className="card" key={c.id}
-            style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span>{c.titulo}</span>
-            <span style={{ color: 'var(--primario)' }}>
-              {c.balance.toLocaleString()} {c.moneda.simbolo}
-            </span>
-          </div>
-        ))}
+        {[...cuentas]
+          .sort((a, b) => {
+            const aEnPrincipal = a.moneda.es_principal ? a.balance : a.balance * (a.moneda.tasa_cambio || 1)
+            const bEnPrincipal = b.moneda.es_principal ? b.balance : b.balance * (b.moneda.tasa_cambio || 1)
+            return bEnPrincipal - aEnPrincipal
+          })
+          .map(c => (
+            <div className="card" key={c.id}
+              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <span>{c.titulo}</span>
+              <div style={{ textAlign: 'right' }}>
+                <span style={{ color: 'var(--primario)' }}>
+                  {c.balance.toLocaleString('es-CL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {c.moneda.simbolo}
+                </span>
+                {!c.moneda.es_principal && (
+                  <p style={{ fontSize: 11, opacity: 0.6, margin: 0 }}>
+                    tasa={c.moneda.tasa_cambio?.toFixed(2)} | {(c.balance * c.moneda.tasa_cambio).toLocaleString('es-CL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {monedaPrincipal?.simbolo}
+                   </p>
+                )}
+              </div>
+            </div>
+          ))}  
 
         {/* Transacciones recientes */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16 }}>
