@@ -24,8 +24,8 @@ from finanzas import views_tasas
 from django.views.generic import TemplateView
 from django.conf import settings
 from django.conf.urls.static import static
-from django.views.static import serve
-import re, os
+
+
 
 router = DefaultRouter()
 router.register(r'monedas', MonedaViewSet, basename='moneda')
@@ -48,6 +48,4 @@ urlpatterns = [
     path('api/tasas/actualizar/', views_tasas.actualizar_todas_tasas, name='actualizar_tasas'),
     
 ]
-urlpatterns += [
-    path('assets/<path:path>', serve, {'document_root': os.path.join(settings.BASE_DIR, 'staticfiles/frontend/assets')}),
-]
+
