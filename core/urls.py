@@ -21,6 +21,10 @@ from finanzas.api import MonedaViewSet, CuentaViewSet, CategoriaViewSet, Transac
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from apps.usuarios import views as usuarios_views
 from finanzas import views_tasas
+from django.views.generic import TemplateView
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 router = DefaultRouter()
 router.register(r'monedas', MonedaViewSet, basename='moneda')
@@ -33,6 +37,7 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('', include('usuarios.urls')),
     path('', include('finanzas.urls')),
+    path('', TemplateView.as_view(template_name='frontend/index.html')),
     path('api/', include(router.urls)),
     path('api/registro/', usuarios_views.registro_view, name='registro'),
     path('api/logout/', usuarios_views.logout_view, name='api_logout'),

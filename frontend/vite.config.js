@@ -9,6 +9,6 @@ export default defineConfig({
     }
   },
   build: {
-    outDir: '../static/frontend',
+    outDir: '../staticfiles/frontend',
   }
 })
