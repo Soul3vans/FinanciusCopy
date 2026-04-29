@@ -1,1 +1,0 @@
-web: python manage.py migrate && python manage.py createsuperuser --noinput --email admin@financius.com && gunicorn core.wsgi --bind 0.0.0.0:$PORT --log-file - || gunicorn core.wsgi --bind 0.0.0.0:$PORT --log-file -
