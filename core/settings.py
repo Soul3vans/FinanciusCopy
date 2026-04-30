@@ -95,6 +95,8 @@ CSRF_TRUSTED_ORIGINS = [
     'https://financiuscopy-production.up.railway.app',
 ]
 
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
+
 # Bloqueo tras 5 intentos
 AXES_FAILURE_LIMIT = 5
 # Bloquea por IP y usuario
