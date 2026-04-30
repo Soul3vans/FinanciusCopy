@@ -160,7 +160,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Base de datos — usa PostgreSQL en producción, SQLite en desarrollo
 import dj_database_url
 
-DATABASE_URL = os.environ.get('DATABASE_URL', None)
+DATABASE_URL = os.environ.get('DB_URL') or os.environ.get('DATABASE_URL', None)
 if DATABASE_URL and isinstance(DATABASE_URL, str) and DATABASE_URL.startswith('postgres'):
     DATABASES = {
         'default': dj_database_url.config(default=DATABASE_URL, conn_max_age=600)
