@@ -229,21 +229,3 @@ SOCIALACCOUNT_PROVIDERS = {
 
 
 
-
-# Al final de tu settings.py
-from django.contrib.sites.models import Site
-
-# Configura automáticamente el sitio basado en el dominio actual
-DOMAIN = 'financiuscopy-production.up.railway.app'
-SITE_ID = 1
-
-# Esto asegura que el sitio exista cuando Django inicia
-try:
-    site = Site.objects.get(id=SITE_ID)
-    if site.domain != DOMAIN:
-        site.domain = DOMAIN
-        site.name = 'Financius Copy'
-        site.save()
-except Site.DoesNotExist:
-    Site.objects.create(id=SITE_ID, domain=DOMAIN, name='Financius Copy')
-
