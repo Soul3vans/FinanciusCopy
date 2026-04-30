@@ -2,6 +2,11 @@ from django.core.management.base import BaseCommand
 from usuarios.models import Usuario
 from django.contrib.sites.models import Site
 import os
+from axes.models import AccessAttempt
+
+# Limpiar intentos fallidos
+AccessAttempt.objects.all().delete()
+self.stdout.write('Intentos fallidos limpiados')
 
 class Command(BaseCommand):
     def handle(self, *args, **kwargs):
