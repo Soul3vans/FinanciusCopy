@@ -1,18 +1,18 @@
 from django.core.management.base import BaseCommand
 from usuarios.models import Usuario
 from django.contrib.sites.models import Site
-import os
 from axes.models import AccessAttempt
-
-# Limpiar intentos fallidos
-AccessAttempt.objects.all().delete()
-self.stdout.write('Intentos fallidos limpiados')
+import os
 
 class Command(BaseCommand):
     def handle(self, *args, **kwargs):
+        # Limpiar intentos fallidos
+        AccessAttempt.objects.all().delete()
+        self.stdout.write('Intentos fallidos limpiados')
+
         # Crear/actualizar Site
         domain = os.environ.get('ALLOWED_HOSTS', 'financiuscopy-production.up.railway.app').split(',')[0]
-        site, _ = Site.objects.update_or_create(
+        Site.objects.update_or_create(
             id=1,
             defaults={'domain': domain, 'name': 'Financius'}
         )
