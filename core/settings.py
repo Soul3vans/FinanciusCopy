@@ -154,10 +154,12 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Base de datos — usa PostgreSQL en producción, SQLite en desarrollo
-DATABASE_URL = os.environ.get('DATABASE_URL', '').strip
-if DATABASE_URL:
+import dj_database_url
+
+DATABASE_URL = os.environ.get('DATABASE_URL', None)
+if DATABASE_URL and isinstance(DATABASE_URL, str) and DATABASE_URL.startswith('postgres'):
     DATABASES = {
-        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
+        'default': dj_database_url.config(default=DATABASE_URL, conn_max_age=600)
     }
 else:
     DATABASES = {
