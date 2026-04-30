@@ -19,8 +19,8 @@ class Command(BaseCommand):
         self.stdout.write(f'Site configurado: {domain}')
 
         # Crear superusuario
-        email = os.environ.get('ADMIN_EMAIL', 'admin@financius.com')
-        password = os.environ.get('ADMIN_PASSWORD', '')
+        email = os.environ.get('ADMIN_EMAIL') or os.environ.get('DJANGO_SUPERUSER_EMAIL', 'admin@financius.com')
+        password = os.environ.get('ADMIN_PASSWORD') or os.environ.get('DJANGO_SUPERUSER_PASSWORD', '')
         if not Usuario.objects.filter(email=email).exists():
             Usuario.objects.create_superuser(
                 email=email, password=password, nombre='Admin'
