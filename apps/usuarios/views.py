@@ -21,8 +21,9 @@ def oauth_token(request):
         'access': str(refresh.access_token),
         'refresh': str(refresh),
     })
+from django.shortcuts import redirect as django_redirect
 def oauth_redirect(request):
-    return redirect('oauth_callback')
+    return django_redirect('/oauth-callback')
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
