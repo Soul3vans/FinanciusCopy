@@ -12,6 +12,17 @@ from django.conf import settings
 from finanzas.db_crypto import cifrar_db, limpiar_db_temporal, DB_ACTIVA, descifrar_db, crear_db_nueva
 import qrcode, io, base64
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def oauth_token(request):
+    from rest_framework_simplejwt.tokens import RefreshToken
+    refresh = RefreshToken.for_user(request.user)
+    return Response({
+        'access': str(refresh.access_token),
+        'refresh': str(refresh),
+    })
+def oauth_redirect(request):
+    return redirect('oauth_callback')
 
 @api_view(['POST'])
 @permission_classes([AllowAny])

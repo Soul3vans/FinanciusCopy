@@ -16,6 +16,7 @@ import FormMoneda from './pages/FormMoneda'
 import Transacciones from './pages/Transacciones'
 import FormTransaccion from './pages/FormTransaccion'
 import Categorias from './pages/Categorias'
+import OAuthCallback from './pages/OAuthCallback'
 
 
 /*function App() {
@@ -155,7 +156,8 @@ export default function App() {
       <Route path="/transacciones/nueva" element={<RutaProtegida><FormTransaccion /></RutaProtegida>} />
       <Route path="/transacciones/:id/editar" element={<RutaProtegida><FormTransaccion /></RutaProtegida>} />
       <Route path="/categorias" element={<RutaProtegida><Categorias /></RutaProtegida>} />
-   
+      <Route path="/oauth-callback" element={<OAuthCallback />} />
+
     </Routes>
   )
 }

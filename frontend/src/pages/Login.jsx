@@ -50,7 +50,7 @@ export default function Login() {
         </div>
 
         {/* OAuth */}
-        <a href="/accounts/google/login/" style={{ textDecoration: 'none' }}>
+        <a href="/accounts/google/login/?next=/api/oauth-redirect/" style={{ textDecoration: 'none' }}>
           <button className="btn btn-secundario" style={{ marginBottom: 8 }}>
             🔵 Google
           </button>

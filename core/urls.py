@@ -46,6 +46,8 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/tasa/', views_tasas.obtener_tasa, name='obtener_tasa'),
     path('api/tasas/actualizar/', views_tasas.actualizar_todas_tasas, name='actualizar_tasas'),
+    path('api/oauth-token/', usuarios_views.oauth_token, name='oauth_token'),
+    path('api/oauth-redirect/', usuarios_views.oauth_redirect, name='oauth_redirect'),
     
 ]
 
