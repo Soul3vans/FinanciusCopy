@@ -23,9 +23,6 @@ from apps.usuarios import views as usuarios_views
 from finanzas import views_tasas
 from django.views.generic import TemplateView
 from django.conf import settings
-from django.conf.urls.static import static
-
-
 
 router = DefaultRouter()
 router.register(r'monedas', MonedaViewSet, basename='moneda')
@@ -34,11 +31,10 @@ router.register(r'categorias', CategoriaViewSet)
 router.register(r'transacciones', TransaccionViewSet)
 
 urlpatterns = [
+    # Admin
     path('admin/', admin.site.urls),
-    path('accounts/', include('allauth.urls')),
-    path('', include('usuarios.urls')),
-    path('', include('finanzas.urls')),
-    path('', TemplateView.as_view(template_name='frontend/index.html')),
+
+    # API
     path('api/', include(router.urls)),
     path('api/registro/', usuarios_views.registro_view, name='registro'),
     path('api/logout/', usuarios_views.logout_view, name='api_logout'),
@@ -46,8 +42,14 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/tasa/', views_tasas.obtener_tasa, name='obtener_tasa'),
     path('api/tasas/actualizar/', views_tasas.actualizar_todas_tasas, name='actualizar_tasas'),
+    path('api/monedas-mundo/', views_tasas.monedas_mundo, name='monedas_mundo'),
     path('api/oauth-token/', usuarios_views.oauth_token, name='oauth_token'),
     path('api/oauth-redirect/', usuarios_views.oauth_redirect, name='oauth_redirect'),
-    
-]
 
+    # OAuth allauth
+    path('accounts/', include('allauth.urls')),
+
+    # React SPA - captura todo lo demás
+    path('', TemplateView.as_view(template_name='frontend/index.html')),
+    path('<path:path>', TemplateView.as_view(template_name='frontend/index.html')),
+]
